@@ -374,25 +374,6 @@
   .fx-portrait .reveal.in .avatar::before{animation:fxScan 1.6s ease-in-out .3s 1 forwards;}
   @keyframes fxScan{0%{top:0;opacity:0;}10%{opacity:.9;}90%{opacity:.9;}100%{top:100%;opacity:0;}}
 
-  /* --- Pannello di test (da rimuovere in produzione) --- */
-  .fx-panel{
-    position:fixed;left:16px;bottom:16px;z-index:200;background:rgba(21,24,28,.94);
-    border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;
-    font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);
-    backdrop-filter:blur(8px);max-width:240px;
-  }
-  .fx-panel strong{display:block;color:var(--accent);letter-spacing:.08em;margin-bottom:8px;font-weight:500;}
-  .fx-panel label{display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer;color:var(--text);}
-  .fx-panel input{accent-color:var(--accent);}
-  .fx-panel .fx-row{display:flex;gap:8px;margin-top:10px;}
-  .fx-panel button{
-    flex:1;background:none;border:1px solid var(--line);color:var(--text);padding:6px 8px;cursor:pointer;
-    font:inherit;border-radius:var(--radius);
-  }
-  .fx-panel button:hover{border-color:var(--accent);color:var(--accent);}
-  .fx-panel.min label,.fx-panel.min .fx-row{display:none;}
-  .fx-panel.min strong{margin:0;cursor:pointer;}
-
   @media (prefers-reduced-motion: reduce){
     .hero-bg,.contact-bg{display:none !important;}
     .fx-stack .stack-layer,.fx-stagger .stagger > *{opacity:1 !important;translate:0 0 !important;}
@@ -400,15 +381,8 @@
   }
 </style>
 <script>
-  /* ANIMAZIONI v1 — attiva gli effetti prima del rendering (evita sfarfallii).
-     Test: ?fx=atom3d,atom,bg,contact,stack,stagger,nav,portrait  (oppure ?fx=none) */
-  (function(){
-    var all=['atom3d','atom','bg','contact','stack','stagger','nav','portrait'];
-    var q=new URLSearchParams(location.search).get('fx');
-    var on=q===null?['atom3d','contact','stack','stagger','nav','portrait']:(q==='none'?[]:q.split(','));
-    window.FX_ALL=all;window.FX_ON=on;
-    on.forEach(function(k){if(all.indexOf(k)>-1)document.documentElement.classList.add('fx-'+k);});
-  })();
+  /* Animazioni attive (versione di produzione) */
+  (function(){['atom3d','contact','stack','stagger','nav','portrait'].forEach(function(k){document.documentElement.classList.add('fx-'+k);});})();
 </script>
 
 </head>
@@ -991,31 +965,6 @@
       window.FX_CONTACT={go:go,halt:function(){halt();x2.clearRect(0,0,W2,H2);}};
     })();
 
-    /* --- Pannello di test (rimuovere in produzione) --- */
-    var labels={atom3d:'Sfondo 3D: atomi e orbite',contact:'Contatto 3D: atomi e orbite',atom:'Sfondo: atomi verso L1',bg:'Sfondo: griglia sensori',stack:'Stack + impulso (hero)',stagger:'Comparse a cascata',nav:'Barra avanzamento + menu',portrait:'Ritratto: scansione'};
-    var panel=document.createElement('div');panel.className='fx-panel';
-    var html='<strong>▸ TEST ANIMAZIONI</strong>';
-    window.FX_ALL.forEach(function(k){
-      html+='<label><input type="checkbox" data-fx="'+k+'"'+(root.classList.contains('fx-'+k)?' checked':'')+'> '+labels[k]+'</label>';
-    });
-    html+='<div class="fx-row"><button type="button" data-act="replay">Ripeti</button><button type="button" data-act="min">Riduci</button></div>';
-    panel.innerHTML=html;document.body.appendChild(panel);
-    panel.addEventListener('change',function(e){
-      var k=e.target.getAttribute('data-fx');if(!k)return;
-      root.classList.toggle('fx-'+k,e.target.checked);
-      if(k==='contact'&&window.FX_CONTACT){e.target.checked?FX_CONTACT.go():FX_CONTACT.halt();}
-      if(k==='bg'||k==='atom'||k==='atom3d'){ if(root.classList.contains('fx-bg')||root.classList.contains('fx-atom')||root.classList.contains('fx-atom3d'))start(); else {stop();ctx.clearRect(0,0,W,H);} }
-    });
-    panel.addEventListener('click',function(e){
-      var act=e.target.getAttribute('data-act');
-      if(act==='min'){panel.classList.add('min');}
-      else if(e.target.tagName==='STRONG'&&panel.classList.contains('min')){panel.classList.remove('min');}
-      else if(act==='replay'){
-        var on=window.FX_ALL.filter(function(k){return root.classList.contains('fx-'+k);});
-        var u=new URL(location.href);u.searchParams.set('fx',on.length?on.join(','):'none');u.hash='';
-        location.href=u.toString();scrollTo(0,0);
-      }
-    });
   })();
 </script>
 
